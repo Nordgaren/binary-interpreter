@@ -2,8 +2,9 @@ use std::mem::size_of;
 use byteorder::*;
 use paste::paste;
 
-#[macro_export]
-    /// generates read<T> functions.
+// #[macro_export]
+#[macro_use]
+    /// generates read_type functions.
     macro_rules! read_type {
     ($ty:ty) => {
         paste! {
@@ -18,7 +19,23 @@ use paste::paste;
                     _ => data.[<read_ $ty>]::<BigEndian>(),
                 }
             }
+        }
+    };
+}
 
+#[macro_export]
+/// generates read_type functions.
+macro_rules! peek_type {
+    ($ty:ty) => {
+        paste! {
+            #[doc = "Reads a `" $ty "` type from the stream at the position then returns to where it started" ]
+            fn [<peek_ $ty>]<T: ByteOrder>(&mut self, position: usize) -> std::io::Result<$ty> {
+                let start = self.stream_position()?;
+                self.seek(SeekFrom::Start(position as u64))?;
+                let byte = self.[<read_ $ty>]::<T>();
+                self.seek(SeekFrom::Start(start))?;
+                return byte;
+            }
         }
     };
 }
