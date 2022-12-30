@@ -28,10 +28,19 @@ use paste::paste;
 macro_rules! peek_type {
     ($ty:ty) => {
         paste! {
-            #[doc = "Reads a `" $ty "` type from the stream at the position then returns to where it started" ]
+            #[doc = "Seeks to position from start of the stream and reads a `" $ty "` type then returns to original position" ]
             fn [<peek_ $ty>]<T: ByteOrder>(&mut self, position: usize) -> std::io::Result<$ty> {
                 let start = self.stream_position()?;
                 self.seek(SeekFrom::Start(position as u64))?;
+                let byte = self.[<read_ $ty>]::<T>();
+                self.seek(SeekFrom::Start(start))?;
+                return byte;
+            }
+
+            #[doc = "Seeks to position from current position of the stream and reads a `" $ty "` type then returns to original position" ]
+            fn [<peek_ahead_ $ty>]<T: ByteOrder>(&mut self, position: usize) -> std::io::Result<$ty> {
+                let start = self.stream_position()?;
+                self.seek(SeekFrom::Current(position as i64))?;
                 let byte = self.[<read_ $ty>]::<T>();
                 self.seek(SeekFrom::Start(start))?;
                 return byte;

@@ -9,6 +9,13 @@ use crate::util;
 use paste::paste;
 
 pub trait BinaryReader: ReadBytesExt {
+
+    fn read_bytes(&mut self, size: usize) -> std::io::Result<Vec<u8>> {
+        let mut buf = vec![0u8; size];
+        self.read_exact(&mut buf[..]);
+        Ok(buf)
+    }
+
     fn read_cstr(&mut self) -> std::io::Result<String> {
         let mut chrs = Vec::new();
         while let chr = self.read_u8()? {
@@ -79,12 +86,7 @@ pub trait BinaryPeeker: ReadBytesExt + Seek {
 impl<R: ReadBytesExt + Seek> BinaryPeeker for R {}
 
 
-// pub enum Endian {
-//     BigEndian,
-//     NetworkEndian,
-//     LittleEndian,
-//     NativeEndian,
-// }
+
 //
 // pub struct BinaryReader {
 //     cursor: Cursor<Vec<u8>>,
