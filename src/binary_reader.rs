@@ -32,6 +32,20 @@ pub trait BinaryReader: ReadBytesExt {
 
         Ok(String::from_utf16(chrs.as_slice()).unwrap())
     }
+
+    fn read_fixed_cstr(&mut self, size: usize) -> std::io::Result<String> {
+        let mut chrs = vec![0u8; size];
+        self.read(&mut chrs[..])?;
+        Ok(String::from_utf8(chrs).unwrap())
+    }
+
+    fn read_fixed_wcstr(&mut self, size: usize) -> std::io::Result<String> {
+        let mut chrs = Vec::new();
+        for i in 0..size {
+            chrs.push(self.read_u16::<NativeEndian>()?);
+        }
+        Ok(String::from_utf16(chrs.as_slice()).unwrap())
+    }
 }
 
 impl<R: ReadBytesExt> BinaryReader for R {}
