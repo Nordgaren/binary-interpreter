@@ -54,7 +54,7 @@ impl<R: ReadBytesExt> BinaryReader for R {}
 
 pub trait BinaryPeeker: ReadBytesExt + Seek {
 
-    fn peek_bytes(&mut self, size: usize, position: u64) -> std::io::Result<Vec<u8>> {
+    fn peek_bytes(&mut self, position: u64, size: usize) -> std::io::Result<Vec<u8>> {
         let mut s = self;
         let start = s.stream_position()?;
         s.seek(SeekFrom::Start(position))?;
@@ -77,6 +77,24 @@ pub trait BinaryPeeker: ReadBytesExt + Seek {
         let start = s.stream_position()?;
         s.seek(SeekFrom::Start(position))?;
         let wcstr = s.read_wcstr();
+        s.seek(SeekFrom::Start(start))?;
+        return wcstr;
+    }
+
+    fn peek_fixed_cstr(&mut self, position: u64, size: usize) -> std::io::Result<String> {
+        let mut s = self;
+        let start = s.stream_position()?;
+        s.seek(SeekFrom::Start(position))?;
+        let cstr = s.read_fixed_cstr(size);
+        s.seek(SeekFrom::Start(start))?;
+        return cstr;
+    }
+
+    fn peek_fixed_wcstr(&mut self, position: u64, size: usize) -> std::io::Result<String> {
+        let mut s = self;
+        let start = s.stream_position()?;
+        s.seek(SeekFrom::Start(position))?;
+        let wcstr = s.read_fixed_wcstr(size);
         s.seek(SeekFrom::Start(start))?;
         return wcstr;
     }

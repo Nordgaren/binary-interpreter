@@ -16,7 +16,6 @@ mod tests {
         let expected = hello_world.as_slice().read_cstr().unwrap();
 
         assert_eq!(expected, "Hello, World!");
-        //assert_eq!(br.length - br.position(), hello_world.len() - br.position());
     }
 
     #[test]
@@ -24,7 +23,6 @@ mod tests {
         let w_hello_world = vec![0x48, 0x00, 0x65, 0x00, 0x6c, 0x00, 0x6c, 0x00, 0x6f, 0x00, 0x2c, 0x00, 0x20, 0x00, 0x57, 0x00, 0x6f, 0x00, 0x72, 0x00, 0x6c, 0x00, 0x64, 0x00, 0x21, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06];
         let expected = w_hello_world.as_slice().read_wcstr().unwrap();
         assert_eq!(expected, "Hello, World!");
-        //assert_eq!(br.length - br.position(), w_hello_world.len() - br.position());
     }
 
     #[test]
@@ -33,7 +31,6 @@ mod tests {
         let expected = hello_world.as_slice().read_fixed_cstr(4).unwrap();
 
         assert_eq!(expected, "Hell");
-        //assert_eq!(br.length - br.position(), hello_world.len() - br.position());
     }
 
     #[test]
@@ -41,105 +38,138 @@ mod tests {
         let w_hello_world = vec![0x48, 0x00, 0x65, 0x00, 0x6c, 0x00, 0x6c, 0x00, 0x6f, 0x00, 0x2c, 0x00, 0x20, 0x00, 0x57, 0x00, 0x6f, 0x00, 0x72, 0x00, 0x6c, 0x00, 0x64, 0x00, 0x21, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06];
         let expected = w_hello_world.as_slice().read_fixed_wcstr(4).unwrap();
         assert_eq!(expected, "Hell");
-        //assert_eq!(br.length - br.position(), w_hello_world.len() - br.position());
     }
 
 
     #[test]
+    fn peek_c_string() {
+        let hello_world: Vec<u8> = vec![0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20, 0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21, 0x0, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06];
+        let mut c = Cursor::new(hello_world);
+        let expected = c.peek_cstr(7).unwrap();
+        assert_eq!(expected, "World!");
+    }
+
+    #[test]
+    fn peek_wide_string() {
+        let w_hello_world: Vec<u8> = vec![0x48, 0x00, 0x65, 0x00, 0x6c, 0x00, 0x6c, 0x00, 0x6f, 0x00, 0x2c, 0x00, 0x20, 0x00, 0x57, 0x00, 0x6f, 0x00, 0x72, 0x00, 0x6c, 0x00, 0x64, 0x00, 0x21, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06];
+        let mut c = Cursor::new(w_hello_world);
+        let expected = c.peek_wcstr(14).unwrap();
+        assert_eq!(expected, "World!");
+    }
+
+    #[test]
+    fn peek_fixed_c_string() {
+        let hello_world: Vec<u8> = vec![0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20, 0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21, 0x0, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06];
+        let mut c = Cursor::new(hello_world);
+        let expected = c.peek_fixed_cstr(7, 4).unwrap();
+        assert_eq!(expected, "Worl");
+    }
+
+    #[test]
+    fn peek_fixed_wide_string() {
+        let w_hello_world: Vec<u8> = vec![0x48, 0x00, 0x65, 0x00, 0x6c, 0x00, 0x6c, 0x00, 0x6f, 0x00, 0x2c, 0x00, 0x20, 0x00, 0x57, 0x00, 0x6f, 0x00, 0x72, 0x00, 0x6c, 0x00, 0x64, 0x00, 0x21, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06];
+        let mut c = Cursor::new(w_hello_world);
+        let expected = c.peek_fixed_wcstr(14, 4).unwrap();
+        assert_eq!(expected, "Worl");
+    }
+    #[test]
     fn peek_u8(){
         let hello_world: Vec<u8> = vec![0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20, 0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21, 0x0, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06];
         let mut c = Cursor::new(hello_world);
-        let expected = c.peek_u8(0).unwrap();
-        assert_eq!(expected, 0x48);
+        let expected = c.peek_u8(12).unwrap();
+        assert_eq!(expected, 33);
     }
 
     #[test]
     fn peek_u16() {
         let hello_world: Vec<u8> = vec![0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20, 0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21, 0x0, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06];
         let mut c = Cursor::new(hello_world);
-        let expected = c.peek_u16::<LE>(0).unwrap();
-        assert_eq!(expected, 0x6548);
-        let expected = c.peek_u16::<BE>(0).unwrap();
-        assert_eq!(expected, 0x4865);
+        let expected = c.peek_u16::<LE>(12).unwrap();
+        assert_eq!(expected, 33);
+        let expected = c.peek_u16::<BE>(12).unwrap();
+        assert_eq!(expected, 8448);
     }
 
     #[test]
     fn peek_u32() {
         let hello_world: Vec<u8> = vec![0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20, 0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21, 0x0, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06];
         let mut c = Cursor::new(hello_world);
-        let expected = c.peek_u32::<LE>(0).unwrap();
-        assert_eq!(expected, 0x6C6C6548);
-        let expected = c.peek_u32::<BE>(0).unwrap();
-        assert_eq!(expected, 0x48656C6C);
+        let expected = c.peek_u32::<LE>(12).unwrap();
+        assert_eq!(expected, 33620001);
+        let expected = c.peek_u32::<BE>(12).unwrap();
+        assert_eq!(expected, 553648386);
     }
 
     #[test]
     fn peek_u64() {
         let hello_world: Vec<u8> = vec![0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20, 0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21, 0x0, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06];
         let mut c = Cursor::new(hello_world);
-        let expected = c.peek_u64::<LE>(0).unwrap();
-        assert_eq!(expected, 0x57202C6F6C6C6548);
-        let expected = c.peek_u64::<BE>(0).unwrap();
-        assert_eq!(expected, 0x48656C6C6F2C2057);
+        let expected = c.peek_u64::<LE>(12).unwrap();
+        assert_eq!(expected, 433757350076153889);
+        let expected = c.peek_u64::<BE>(12).unwrap();
+        assert_eq!(expected, 2377901711403779334);
     }
 
     #[test]
     fn peek_u128() {
         let hello_world: Vec<u8> = vec![0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20, 0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21, 0x0, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06];
         let mut c = Cursor::new(hello_world);
-        let expected = c.peek_u128::<LE>(0).unwrap();
-        assert_eq!(expected, 0x2010021646C726F57202C6F6C6C6548);
-        let expected = c.peek_u128::<BE>(0).unwrap();
-        assert_eq!(expected, 0x48656C6C6F2C20576F726C6421000102);
+        let expected = c.peek_u128::<LE>(4).unwrap();
+        assert_eq!(expected, 8001410826945251086481347135810841711);
+        let expected = c.peek_u128::<BE>(4).unwrap();
+        assert_eq!(expected, 147773424558349815398666691838377985286);
     }
 
     #[test]
     fn peek_i8(){
         let hello_world: Vec<u8> = vec![0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20, 0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21, 0x0, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06];
         let mut c = Cursor::new(hello_world);
-        let expected = c.peek_i8(0).unwrap();
-        assert_eq!(expected, 0x48);
+        let expected = c.peek_i8(12).unwrap();
+        assert_eq!(expected, 33);
     }
 
     #[test]
     fn peek_i16() {
         let hello_world: Vec<u8> = vec![0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20, 0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21, 0x0, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06];
         let mut c = Cursor::new(hello_world);
-        let expected = c.peek_i16::<LE>(0).unwrap();
-        assert_eq!(expected, 0x6548);
-        let expected = c.peek_i16::<BE>(0).unwrap();
-        assert_eq!(expected, 0x4865);
+        let expected = c.peek_i16::<LE>(12).unwrap();
+        assert_eq!(expected, 33);
+        let expected = c.peek_i16::<BE>(12).unwrap();
+        assert_eq!(expected, 8448);
     }
 
     #[test]
     fn peek_i32() {
         let hello_world: Vec<u8> = vec![0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20, 0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21, 0x0, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06];
         let mut c = Cursor::new(hello_world);
-        let expected = c.peek_i32::<LE>(0).unwrap();
-        assert_eq!(expected, 0x6C6C6548);
-        let expected = c.peek_i32::<BE>(0).unwrap();
-        assert_eq!(expected, 0x48656C6C);
+        let expected = c.peek_i32::<LE>(12).unwrap();
+        assert_eq!(expected, 33620001);
+        let expected = c.peek_i32::<BE>(12).unwrap();
+        assert_eq!(expected, 553648386);
     }
 
     #[test]
     fn peek_i64() {
         let hello_world: Vec<u8> = vec![0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20, 0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21, 0x0, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06];
         let mut c = Cursor::new(hello_world);
-        let expected = c.peek_i64::<LE>(0).unwrap();
-        assert_eq!(expected, 0x57202C6F6C6C6548);
-        let expected = c.peek_i64::<BE>(0).unwrap();
-        assert_eq!(expected, 0x48656C6C6F2C2057);
+        let expected = c.peek_i64::<LE>(12).unwrap();
+        assert_eq!(expected, 433757350076153889);
+        let expected = c.peek_i64::<BE>(12).unwrap();
+        assert_eq!(expected, 2377901711403779334);
     }
 
     #[test]
     fn peek_i128() {
         let hello_world: Vec<u8> = vec![0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20, 0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21, 0x0, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06];
         let mut c = Cursor::new(hello_world);
-        let expected = c.peek_i128::<LE>(0).unwrap();
-        assert_eq!(expected, 0x2010021646C726F57202C6F6C6C6548);
-        let expected = c.peek_i128::<BE>(0).unwrap();
-        assert_eq!(expected, 0x48656C6C6F2C20576F726C6421000102);
+        let expected = c.peek_i128::<LE>(4).unwrap();
+        assert_eq!(expected, 8001410826945251086481347135810841711);
+        let expected = c.peek_i128::<BE>(4).unwrap();
+        assert_eq!(expected, 147773424558349815398666691838377985286);
     }
+
+
+    // old test code for old version of crate
     // #[test]
     // fn read_byte() {
     //     let w_hello_world = vec![0x48, 0x00, 0x65, 0x00, 0x6c, 0x00, 0x6c, 0x00, 0x6f, 0x00, 0x2c, 0x00, 0x20, 0x00, 0x57, 0x00, 0x6f, 0x00, 0x72, 0x00, 0x6c, 0x00, 0x64, 0x00, 0x21, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06];
