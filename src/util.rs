@@ -1,9 +1,5 @@
-use std::mem::size_of;
-use byteorder::*;
-use paste::paste;
 
-// #[macro_export]
-#[macro_use]
+#[macro_export]
     /// generates read_type functions.
     macro_rules! read_type {
     ($ty:ty) => {

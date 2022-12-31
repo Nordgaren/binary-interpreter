@@ -16,8 +16,7 @@ pub enum Endian {
 #[cfg(test)]
 mod tests {
     use std::io::Cursor;
-    use std::io::SeekFrom::End;
-    use byteorder::{BE, LE,NativeEndian, ReadBytesExt};
+    use byteorder::{BE, LE};
     use crate::binary_reader::{BinaryPeeker, BinaryReader};
 
     #[test]

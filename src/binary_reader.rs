@@ -1,18 +1,13 @@
-use std::fs;
-use std::io::{BufRead, Cursor, Read, Seek, SeekFrom};
-use std::mem::size_of;
-use std::path::PathBuf;
-use crate::error::*;
-use byteorder::{ReadBytesExt, BE, LE, NetworkEndian, NativeEndian, BigEndian, LittleEndian, WriteBytesExt, ByteOrder};
-use crate::{binary_reader, peek_type};
-use crate::util;
+use std::io::{Seek, SeekFrom};
+use byteorder::{ReadBytesExt, NativeEndian, ByteOrder};
+use crate::{peek_type};
 use paste::paste;
 
 pub trait BinaryReader: ReadBytesExt {
 
     fn read_bytes(&mut self, size: usize) -> std::io::Result<Vec<u8>> {
         let mut buf = vec![0u8; size];
-        self.read_exact(&mut buf[..]);
+        self.read_exact(&mut buf[..])?;
         Ok(buf)
     }
 
@@ -48,7 +43,7 @@ pub trait BinaryReader: ReadBytesExt {
 
     fn read_fixed_wcstr(&mut self, size: usize) -> std::io::Result<String> {
         let mut chrs = Vec::new();
-        for i in 0..size {
+        for _ in 0..size {
             chrs.push(self.read_u16::<NativeEndian>()?);
         }
         Ok(String::from_utf16(chrs.as_slice()).unwrap())
