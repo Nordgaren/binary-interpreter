@@ -1,7 +1,5 @@
 extern crate core;
 
-use byteorder::{BigEndian, LittleEndian, NativeEndian, NetworkEndian};
-
 pub mod binary_reader;
 pub mod error;
 mod util;

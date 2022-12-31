@@ -25,9 +25,9 @@ macro_rules! peek_type {
     ($ty:ty) => {
         paste! {
             #[doc = "Seeks to position from start of the stream and reads a `" $ty "` type then returns to original position" ]
-            fn [<peek_ $ty>]<T: ByteOrder>(&mut self, position: usize) -> std::io::Result<$ty> {
+            fn [<peek_ $ty>]<T: ByteOrder>(&mut self, position: u64) -> std::io::Result<$ty> {
                 let start = self.stream_position()?;
-                self.seek(SeekFrom::Start(position as u64))?;
+                self.seek(SeekFrom::Start(position))?;
                 let byte = self.[<read_ $ty>]::<T>();
                 self.seek(SeekFrom::Start(start))?;
                 return byte;

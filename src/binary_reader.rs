@@ -53,17 +53,45 @@ pub trait BinaryReader: ReadBytesExt {
 impl<R: ReadBytesExt> BinaryReader for R {}
 
 pub trait BinaryPeeker: ReadBytesExt + Seek {
-    fn peek_u8(&mut self, position: usize) -> std::io::Result<u8> {
+
+    fn peek_bytes(&mut self, size: usize, position: u64) -> std::io::Result<Vec<u8>> {
+        let mut s = self;
+        let start = s.stream_position()?;
+        s.seek(SeekFrom::Start(position))?;
+        let bytes = s.read_bytes(size);
+        s.seek(SeekFrom::Start(start))?;
+        return bytes;
+    }
+
+    fn peek_cstr(&mut self, position: u64) -> std::io::Result<String> {
+        let mut s = self;
+        let start = s.stream_position()?;
+        s.seek(SeekFrom::Start(position))?;
+        let cstr = s.read_cstr();
+        s.seek(SeekFrom::Start(start))?;
+        return cstr;
+    }
+
+    fn peek_wcstr(&mut self, position: u64) -> std::io::Result<String> {
+        let mut s = self;
+        let start = s.stream_position()?;
+        s.seek(SeekFrom::Start(position))?;
+        let wcstr = s.read_wcstr();
+        s.seek(SeekFrom::Start(start))?;
+        return wcstr;
+    }
+
+    fn peek_u8(&mut self, position: u64) -> std::io::Result<u8> {
         let start = self.stream_position()?;
-        self.seek(SeekFrom::Start(position as u64))?;
+        self.seek(SeekFrom::Start(position))?;
         let byte = self.read_u8();
         self.seek(SeekFrom::Start(start))?;
         return byte;
     }
 
-    fn peek_i8(&mut self, position: usize) -> std::io::Result<i8> {
+    fn peek_i8(&mut self, position: u64) -> std::io::Result<i8> {
         let start = self.stream_position()?;
-        self.seek(SeekFrom::Start(position as u64))?;
+        self.seek(SeekFrom::Start(position))?;
         let byte = self.read_i8();
         self.seek(SeekFrom::Start(start))?;
         return byte;
