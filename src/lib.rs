@@ -6,13 +6,6 @@ pub mod binary_reader;
 pub mod error;
 mod util;
 
-pub enum Endian {
-    BigEndian(BigEndian),
-    NetworkEndian(NetworkEndian),
-    LittleEndian(LittleEndian),
-    NativeEndian(NativeEndian),
-}
-
 #[cfg(test)]
 mod tests {
     use std::io::Cursor;
