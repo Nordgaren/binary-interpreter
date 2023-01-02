@@ -1,2 +1,2 @@
 # binary-interpreter
-A trait crate that extends the ByteOrder methods.
+A trait crate that extends the ByteOrder trait.
