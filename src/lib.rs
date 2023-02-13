@@ -3,6 +3,7 @@ extern crate core;
 pub mod binary_reader;
 pub mod error;
 mod util;
+pub mod pod;
 
 #[cfg(test)]
 mod tests {

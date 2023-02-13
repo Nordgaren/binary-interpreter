@@ -1,4 +1,4 @@
-use std::io::{Seek, SeekFrom};
+use std::io::{Read, Seek, SeekFrom};
 use byteorder::{ReadBytesExt, NativeEndian, ByteOrder};
 use crate::{peek_type};
 use paste::paste;
@@ -19,7 +19,6 @@ pub trait BinaryReader: ReadBytesExt {
             }
             chrs.push(chr);
         }
-
         Ok(String::from_utf8(chrs).unwrap())
     }
 
@@ -31,7 +30,6 @@ pub trait BinaryReader: ReadBytesExt {
             }
             chrs.push(chr);
         }
-
         Ok(String::from_utf16(chrs.as_slice()).unwrap())
     }
 
@@ -42,7 +40,7 @@ pub trait BinaryReader: ReadBytesExt {
     }
 
     fn read_fixed_wcstr(&mut self, size: usize) -> std::io::Result<String> {
-        let mut chrs = Vec::new();
+        let mut chrs = Vec::with_capacity(size);
         for _ in 0..size {
             chrs.push(self.read_u16::<NativeEndian>()?);
         }
@@ -50,52 +48,47 @@ pub trait BinaryReader: ReadBytesExt {
     }
 }
 
-impl<R: ReadBytesExt> BinaryReader for R {}
+impl<R: ReadBytesExt + ?Sized> BinaryReader for R {}
 
 pub trait BinaryPeeker: ReadBytesExt + Seek {
 
     fn peek_bytes(&mut self, position: u64, size: usize) -> std::io::Result<Vec<u8>> {
-        let mut s = self;
-        let start = s.stream_position()?;
-        s.seek(SeekFrom::Start(position))?;
-        let bytes = s.read_bytes(size);
-        s.seek(SeekFrom::Start(start))?;
+        let start = self.stream_position()?;
+        self.seek(SeekFrom::Start(position))?;
+        let bytes = self.read_bytes(size);
+        self.seek(SeekFrom::Start(start))?;
         return bytes;
     }
 
     fn peek_cstr(&mut self, position: u64) -> std::io::Result<String> {
-        let mut s = self;
-        let start = s.stream_position()?;
-        s.seek(SeekFrom::Start(position))?;
-        let cstr = s.read_cstr();
-        s.seek(SeekFrom::Start(start))?;
+        let start = self.stream_position()?;
+        self.seek(SeekFrom::Start(position))?;
+        let cstr = self.read_cstr();
+        self.seek(SeekFrom::Start(start))?;
         return cstr;
     }
 
     fn peek_wcstr(&mut self, position: u64) -> std::io::Result<String> {
-        let mut s = self;
-        let start = s.stream_position()?;
-        s.seek(SeekFrom::Start(position))?;
-        let wcstr = s.read_wcstr();
-        s.seek(SeekFrom::Start(start))?;
+        let start = self.stream_position()?;
+        self.seek(SeekFrom::Start(position))?;
+        let wcstr = self.read_wcstr();
+        self.seek(SeekFrom::Start(start))?;
         return wcstr;
     }
 
     fn peek_fixed_cstr(&mut self, position: u64, size: usize) -> std::io::Result<String> {
-        let mut s = self;
-        let start = s.stream_position()?;
-        s.seek(SeekFrom::Start(position))?;
-        let cstr = s.read_fixed_cstr(size);
-        s.seek(SeekFrom::Start(start))?;
+        let start = self.stream_position()?;
+        self.seek(SeekFrom::Start(position))?;
+        let cstr = self.read_fixed_cstr(size);
+        self.seek(SeekFrom::Start(start))?;
         return cstr;
     }
 
     fn peek_fixed_wcstr(&mut self, position: u64, size: usize) -> std::io::Result<String> {
-        let mut s = self;
-        let start = s.stream_position()?;
-        s.seek(SeekFrom::Start(position))?;
-        let wcstr = s.read_fixed_wcstr(size);
-        s.seek(SeekFrom::Start(start))?;
+        let start = self.stream_position()?;
+        self.seek(SeekFrom::Start(position))?;
+        let wcstr = self.read_fixed_wcstr(size);
+        self.seek(SeekFrom::Start(start))?;
         return wcstr;
     }
 
